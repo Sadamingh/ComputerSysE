@@ -4,6 +4,7 @@
 ldr r0, GPFSEL2
 mov r1, #8
 str r1, [r0]
+
 mov r1, #(1<<21)
 
 loop:
