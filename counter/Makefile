@@ -1,4 +1,4 @@
-NAME = blink
+NAME = counter
 CFLAGS = -Og -Wall -std=c99 -ffreestanding
 LDFLAGS = -nostdlib -e main
 
