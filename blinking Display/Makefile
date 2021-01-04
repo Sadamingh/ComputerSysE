@@ -2,8 +2,6 @@ NAME = blink
 CFLAGS = -Og -Wall -std=c99 -ffreestanding
 LDFLAGS = -nostdlib -e main
 
-.PRECIOUS: %.elf %.o
-
 all : $(NAME).bin
 
 %.bin: %.elf
