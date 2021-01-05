@@ -7,6 +7,7 @@ static volatile unsigned int *CLR0  =  (unsigned int *)0x20200028;
 void main(void) {
 	// set GPIO 20-26 to output
     *FSEL2 = 0b1001001001001001001; 
+    
 
     // assign the rules for displaying digits
     int digit0 = 0b111111;
