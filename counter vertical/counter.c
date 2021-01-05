@@ -6,8 +6,9 @@ static volatile unsigned int *CLR0  =  (unsigned int *)0x20200028;
 #define DELAY 0x3f0000
 
 void main(void) {
-    // set GPIO 20-26 to output
+    // set GPIO 10-13 to output
     *FSEL1 = 0b1001001001;
+    // set GPIO 20-26 to output
     *FSEL2 = 0b1001001001001001001; 
     
 
