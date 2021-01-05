@@ -4,7 +4,7 @@ static volatile unsigned int *SET0  =  (unsigned int *)0x2020001c;
 static volatile unsigned int *CLR0  =  (unsigned int *)0x20200028;
 
 #define DELAY 0x3f00
-#define DELAY_LONG 0x1
+#define DELAY_LONG 0x3f
 
 void main(void) {
     // set GPIO 10-13 to output
@@ -24,7 +24,7 @@ void main(void) {
         0b1111111,
         0b1101111};
 
-    int value = 1;
+    int value = 0;
     int digits[4];
 
     while (1) {
