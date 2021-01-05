@@ -5,8 +5,10 @@ static volatile unsigned int *CLR0  =  (unsigned int *)0x20200028;
 #define DELAY 0x3f0000
 
 void main(void) {
+	// set GPIO 20-26 to output
     *FSEL2 = 0b1001001001001001001; 
 
+    // assign the rules for displaying digits
     int digit0 = 0b111111;
     int digit1 = 0b110;
     int digit2 = 0b1011011;
@@ -22,7 +24,7 @@ void main(void) {
         *SET0 = digit0 << 20; 
         for (int c = DELAY; c != 0; c--) ; 
         *CLR0 = digit0 << 20; 
-
+ 
     	*SET0 = digit1 << 20; 
         for (int c = DELAY; c != 0; c--) ; 
         *CLR0 = digit1 << 20; 
