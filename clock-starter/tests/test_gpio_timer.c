@@ -1,95 +1,56 @@
-#include "../gpio.h"
-#include "../timer.h"
+#include "assert.h"
+#include "gpio.h"
+#include "timer.h"
 
-#define assert(x) if(!(x)) abort()
+void test_gpio_set_get_function(void) {
+    gpio_init();
 
-#define GPIO_FSEL3  ((unsigned int *)0x2020000c)
-#define GPIO_SET1   ((unsigned int *)0x20200020)
-#define GPIO_CLR1   ((unsigned int *)0x2020002c)
+    // Test get pin function (pin2 defaults to input)
+    assert( gpio_get_function(GPIO_PIN2) == GPIO_FUNC_INPUT );
 
-// Red power LED (on Pi board) is GPIO 35.
-#define ABORT_OUTPUT (1 << (3*5))
-#define ABORT_BIT    (1 << (35-32))
+    // Test set pin to output
+    gpio_set_output(GPIO_PIN2);
 
-#define DELAY 0x100000
+    // Test get pin function after setting
+    assert( gpio_get_function(GPIO_PIN2) == GPIO_FUNC_OUTPUT );
 
-// abort goes into an infinite loop that flashes the red power LED.
-void abort(void) {
-    // First, configure GPIO 35 function to be output.
-    // This assignment wipes functions for other pins in this register
-    // (GPIO 30-39), but that's okay, because this is a dead-end routine.
-    *GPIO_FSEL3 = ABORT_OUTPUT;
-    while (1) {
-        *GPIO_SET1 = ABORT_BIT;
-        // These delay loops have volatile counters to prevent being
-        // optimized out.
-        for (volatile int i = 0; i < DELAY; i++) ;
-        *GPIO_CLR1 = ABORT_BIT;
-        for (volatile int i = 0; i < DELAY; i++) ;
-    }
 }
 
-void test_gpio(void) {
-  gpio_init();
+void test_gpio_read_write(void) {
+    gpio_init();
+    gpio_set_function(GPIO_PIN20, GPIO_FUNC_OUTPUT);
 
-  gpio_set_function(20, GPIO_FUNC_INPUT);
-  assert(gpio_get_function(20) == GPIO_FUNC_INPUT);
+    // Test gpio_write low, then gpio_read
+    gpio_write(GPIO_PIN20, 0);
+    assert( gpio_read(GPIO_PIN20) ==  0 );
 
-  gpio_set_function(20, GPIO_FUNC_OUTPUT);
-  assert(gpio_get_function(20) == GPIO_FUNC_OUTPUT);
-
-  gpio_set_function(22, GPIO_FUNC_ALT1);
-  assert(gpio_get_function(20) == GPIO_FUNC_OUTPUT);
-  assert(gpio_get_function(22) == GPIO_FUNC_ALT1);
-
-  gpio_set_input(22);
-  assert(gpio_get_function(22) == GPIO_FUNC_INPUT);
-
-  gpio_set_output(23);
-  assert(gpio_get_function(23) == GPIO_FUNC_OUTPUT);
-
-  gpio_set_input(20);
-  gpio_set_output(21);
-  gpio_set_function(22, GPIO_FUNC_ALT0);
-  gpio_set_function(23, GPIO_FUNC_ALT1);
-  gpio_set_function(24, GPIO_FUNC_ALT2);
-  gpio_set_function(25, GPIO_FUNC_ALT3);
-  gpio_set_function(26, GPIO_FUNC_ALT4);
-  gpio_set_function(27, GPIO_FUNC_ALT5);
-
-  assert(gpio_get_function(20) == GPIO_FUNC_INPUT);
-  assert(gpio_get_function(21) == GPIO_FUNC_OUTPUT);
-  assert(gpio_get_function(22) == GPIO_FUNC_ALT0);
-  assert(gpio_get_function(23) == GPIO_FUNC_ALT1);
-  assert(gpio_get_function(24) == GPIO_FUNC_ALT2);
-  assert(gpio_get_function(25) == GPIO_FUNC_ALT3);
-  assert(gpio_get_function(26) == GPIO_FUNC_ALT4);
-  assert(gpio_get_function(27) == GPIO_FUNC_ALT5);
+   // Test gpio_write high, then gpio_read
+    gpio_write(GPIO_PIN20, 1);
+    assert( gpio_read(GPIO_PIN20) ==  1 );
 }
 
 void test_timer(void) {
-  timer_init();
+    timer_init();
 
-  u32 start = timer_get_ticks();
-  u32 end = timer_get_ticks();
-  assert(end >= start);
+    // Test timer tick count incrementing
+    unsigned int start = timer_get_ticks();
+    for( int i=0; i<10; i++ ) { /* Spin */ }
+    unsigned int finish = timer_get_ticks();
+    assert( finish > start );
 
-  start = timer_get_ticks();
-  timer_delay(1);
-  assert(timer_get_ticks() - start >= 1000000);
-
-  start = timer_get_ticks();
-  timer_delay_ms(1);
-  assert(timer_get_ticks() - start >= 1000);
-
-  start = timer_get_ticks();
-  timer_delay_us(100);
-  assert(timer_get_ticks() - start >= 100);
+    // Test timer delay
+    int usecs = 100;
+    start = timer_get_ticks();
+    timer_delay_us(usecs);
+    finish = timer_get_ticks();
+    assert( finish >= start + usecs );
 }
 
-void main(
-  void
-) {
-  /* test_gpio(); */
-  test_timer();
+// Uncomment each call below when you have implemented the functions
+// and are ready to test them
+
+void main(void) {
+    // test_gpio_set_get_function();
+    // test_gpio_read_write();
+    // test_timer();
 }
