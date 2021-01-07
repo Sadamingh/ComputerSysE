@@ -4,6 +4,7 @@
 #define DELAY 0x3f0000
 
 void displaydigit(int value);
+void displaytime(int value);
 
 unsigned int digit[] = {
     0x3f, // 0 0b00111111
@@ -35,18 +36,23 @@ void main(void)
 		gpio_set_output(t);
 	}
 
-	// Set 1 to the GPIO 13 pin to display 
-	// on the last digit.
-	gpio_write(GPIO_PIN13, 1);
+	// set the input pin
+	gpio_set_input(2);
+
+	// initial the time
+	int ctime = 0;
 
 	// Display the digits.
-	for (int i = 0; ; i++) {
-		displaydigit(i);
-		// Delay a certain time.
-		for (int c = DELAY; c != 0; c--) ;
-    	if (i == 16) i = -1;
+	while (1) {
+		displaytime(-1);
+		if (gpio_read(GPIO_PIN2) == 0) break;
 	}
 
+	while (1) {
+		displaytime(ctime);
+		ctime++;
+		if (ctime > 9999) ctime = 0;
+	}
 }
 
 void displaydigit(int value) {
@@ -62,5 +68,32 @@ void displaydigit(int value) {
 			gpio_write(i, 0);
 		}
 		toDisplay = toDisplay >> 1;
+	}
+}
+
+void displaytime(int value) {
+	// Set a four-digit array.
+	int digits[4];
+
+	// If given -1, display four dashes.
+	if (value == -1) {
+		digits[0] = 16;
+		digits[1] = 16;
+		digits[2] = 16;
+		digits[3] = 16;
+	} else {
+		digits[0] = (value - value % 1000) / 1000;
+		digits[1] = value % 1000 / 100;
+		digits[2] = value % 100 / 10;
+		digits[3] = value % 10;
+	}
+	unsigned long start_time = timer_get_ticks();
+	while ((timer_get_ticks() - start_time) / 1000000 == 0) {
+		for (int i = 0; i < 4; i++) {
+			gpio_write(10+i, 1);
+			displaydigit(digits[i]);
+			timer_delay_us(2500);
+			gpio_write(10+i, 0);
+		}	
 	}
 }
