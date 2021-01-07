@@ -16,7 +16,7 @@ void gpio_set_function(unsigned int pin, unsigned int function) {
 	// Get the FSEL based on the pin.
 	volatile unsigned int *FSEL = FSEL_BASE + (pin / 10);
 
-	// Settings for other pins should be unchanged. 
+	// Settings foar other pins should be unchanged. 
 	// Use a mask to clear the set value.
 	int offset = (pin % 10) * 3;
 	*FSEL = *FSEL & ~(0b111 << offset);
@@ -52,7 +52,7 @@ void gpio_write(unsigned int pin, unsigned int value) {
 	// Get the offset based on the pin.
 	int offset = pin % 32;
 
-	// Find out whether set or clear and assign the value.
+	// Find out whether to set or to clear and then assign the value.
 	if (value) {
 		volatile unsigned int *reg = SET_BASE + (pin / 32);
 		// Set the level value for GPIO pin number `pin`.
