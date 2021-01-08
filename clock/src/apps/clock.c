@@ -5,6 +5,7 @@
 
 void displaydigit(int value);
 void displaytime(int value);
+void displaydashes(void);
 
 unsigned int digit[] = {
     0x3f, // 0 0b00111111
@@ -44,14 +45,22 @@ void main(void)
 
 	// Display the digits.
 	while (1) {
-		displaytime(-1);
-		if (gpio_read(GPIO_PIN2) == 0) break;
-	}
-
-	while (1) {
-		displaytime(ctime);
-		ctime++;
-		if (ctime > 9999) ctime = 0;
+		while (gpio_read(GPIO_PIN2) == 0) displaydashes();
+		displaydashes();
+		if (gpio_read(GPIO_PIN2) == 0) {
+			while (gpio_read(GPIO_PIN2) == 0) {
+				displaytime(0);
+			};
+			while (1) {
+				displaytime(ctime);
+				ctime++;
+				if (ctime > 9999) ctime = 0;
+				if (gpio_read(GPIO_PIN2) == 0) {
+					ctime = 0;
+					break;
+				}
+			}
+		}
 	}
 }
 
@@ -68,6 +77,24 @@ void displaydigit(int value) {
 			gpio_write(i, 0);
 		}
 		toDisplay = toDisplay >> 1;
+	}
+}
+
+void displaydashes(void) {
+	// Set a four-digit array.
+	int digits[4];
+
+	// If given -1, display four dashes.
+	digits[0] = 16;
+	digits[1] = 16;
+	digits[2] = 16;
+	digits[3] = 16;
+
+	for (int i = 0; i < 4; i++) {
+		gpio_write(10+i, 1);
+		displaydigit(digits[i]);
+		timer_delay_us(2500);
+		gpio_write(10+i, 0);
 	}
 }
 
