@@ -45,16 +45,24 @@ void main(void)
 
 	// Display the digits.
 	while (1) {
+		// wait for a time until the button is released.
 		while (gpio_read(GPIO_PIN2) == 0) displaydashes();
+		// show dashes.
 		displaydashes();
+		// check if the button is pressed
 		if (gpio_read(GPIO_PIN2) == 0) {
+			// wait for a time until the button is released
 			while (gpio_read(GPIO_PIN2) == 0) {
 				displaytime(0);
 			};
+			// start the counting loop
 			while (1) {
+				// display the present value
 				displaytime(ctime);
 				ctime++;
+				// if overflow, back to 0
 				if (ctime > 9999) ctime = 0;
+				// if the button pressed, clear and break the loop
 				if (gpio_read(GPIO_PIN2) == 0) {
 					ctime = 0;
 					break;
